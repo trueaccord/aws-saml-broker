@@ -1,5 +1,5 @@
 Flask==0.10.1
 pysaml2==2.2.0
 boto==2.35.2
-requests=2.3.0
+requests==2.3.0
 
