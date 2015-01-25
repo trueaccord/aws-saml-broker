@@ -7,15 +7,15 @@ credentials based on SAML attributes.
 Building
 --------
 
-Building is based on Docker though it should be trivial to figure out how to
-install locally by inspecting the Dockerfile.
+Building is based on a Dockerfile, however it should be straightforward to 
+to install locally by inspecting the Dockerfile.
 
    $ docker build -t aws-saml-broker .
 
 Configuring
 -----------
 
-### Creating gateway user
+### Creating a gateway user
 
 In AWS IAM console, create a new user, and download his AWS credentials.
 Click on the newly created user, choose 'Attach User Policy', select 'Custom
