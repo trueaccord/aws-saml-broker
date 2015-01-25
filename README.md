@@ -61,11 +61,11 @@ previous step.
 
 ### Setting up Okta as an identity provider
 
-aws-saml-broker works with any SAML identity provider.  This section explains
-how to configure Okta as a provider.
+aws-saml-broker works with any Identity Provider that speaks SAML. This section explains
+how to configure Okta to work with aws-saml-broker.
 
-In Okta, add a new app using the 'Saml 2.0 Template'. Set the Post Back URL to
-the URL the app will be serving from.  If you are only testing, you can write
+In Okta, add a new app using the 'Template SAML 2.0 App'. Set the Post Back URL to
+the URL the app will be serving from.  If you are testing locally, enter
 `http://localhost:5000`.
 
 Set *Attribute Statements* to `email|${user.email}`
