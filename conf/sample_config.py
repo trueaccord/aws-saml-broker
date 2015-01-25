@@ -24,4 +24,11 @@ CONFIG = {
   # variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
   'aws_access_key_id': None,
   'aws_secret_access_key': None,
+
+  # Uncomment the Okta section if you want to enable a programmatic API
+  # to authenticate with Okta and get groups.
+  # 'okta': {
+  #     'api_token': '...'
+  #     'domain': 'yourdomain.okta.com',
+  # }
 }

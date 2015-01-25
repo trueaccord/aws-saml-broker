@@ -7,8 +7,14 @@ credentials based on SAML attributes.
 Building
 --------
 
-Building is based on a Dockerfile, however it should be straightforward to 
+Our build is based on a Dockerfile, however it should be straightforward to
 to install locally by inspecting the Dockerfile.
+
+To pull a prebuilt image:
+
+   $ docker pull thesamet/aws-saml-broker
+
+To build the image from scratch:
 
    $ docker build -t aws-saml-broker .
 

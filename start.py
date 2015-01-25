@@ -4,14 +4,16 @@ from flask import Flask
 from flask import request, redirect, Response
 import argparse
 import base64
-import json
 import requests
 import saml2
 import saml2.client
 import saml2.config
 import boto
 import boto.exception
+import okta
+import json
 from boto import sts
+import requests
 
 
 app = Flask(__name__)
@@ -35,7 +37,7 @@ def find_aws_role(groups):
         return None
 
 
-def get_credentials_for(role_arn):
+def get_credentials_for(session_name, role_arn):
     conn = sts.connect_to_region(
         CONFIG.get('aws_region'),
         aws_access_key_id = CONFIG.get('aws_access_key_id'),
@@ -45,20 +47,20 @@ def get_credentials_for(role_arn):
     try:
         c = conn.assume_role(
           role_arn = role_arn,
-          role_session_name = 'Moshic')
+          role_session_name = session_name)
     except boto.exception.BotoServerError, e:
         return 'AssumeRole failed.', 401
-    return print_aws_config(c.credentials)
+    return c.credentials
 
 
-def print_aws_config(creds):
-    return Response("""[default]
-# Will expire on %s
-aws_access_key_id = %s
-aws_secret_access_key = %s
-aws_session_token = %s
-""" % (creds.expiration, creds.access_key, creds.secret_key, creds.session_token), mimetype='text/plain')
-
+FORMATS = {
+        'awscli': ('text/plain', lambda c: """[default]
+# Will expire on %(expiration)s
+aws_access_key_id = %(aws_access_key_id)s
+aws_secret_access_key = %(aws_secret_access_key)s
+aws_session_token = %(aws_session_token)s""" % c),
+        'json': ('application/json', lambda c: json.dumps(c, indent=4))
+        }
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -82,13 +84,44 @@ def index():
     except KeyError:
         return 'Group attribute was not found in SAML.', 400
 
+    return response_from_groups(session=user, groups=groups, format='awscli')
+
+
+@app.route("/login/okta", methods=['POST'])
+def login_okta():
+    okta_config = CONFIG.get('okta')
+    format = request.args.get('format', 'json')
+    if format not in FORMATS:
+        return 'Unsupported format', 400
+
+    if not okta_config:
+        return "Okta is not configured.", 400
+    username = request.form['username']
+    password = request.form['password']
+    try:
+        email, user_id = okta.validate_user(okta_config, username, password)
+        groups = okta.get_groups(okta_config, user_id)
+    except okta.OktaException, e:
+        return str(e)
+    return response_from_groups(session_name=email, groups=groups, format=format)
+
+
+def response_from_groups(session_name, groups, format=format):
     if not groups:
-        return 'No SAML groups found in SAML.', 400
+        return 'No groups found.', 400
     aws_role = find_aws_role(groups)
     if aws_role is None:
         return 'Could not find an AWS role for group memberships', 400
 
-    return get_credentials_for(aws_role)
+    creds =  get_credentials_for(session_name, aws_role)
+    context = {
+            'expiration': creds.expiration,
+            'aws_access_key_id': creds.access_key,
+            'aws_secret_access_key': creds.secret_key,
+            'aws_session_token': creds.session_token
+    }
+    mime_type, call = FORMATS[format]
+    return Response(call(context), mimetype=mime_type)
 
 
 def read_config(filename):
