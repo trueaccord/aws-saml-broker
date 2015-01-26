@@ -48,8 +48,6 @@ def get_credentials_for(session_name, role_arn):
         c = conn.assume_role(
           role_arn = role_arn,
           role_session_name = session_name)
-    except boto.exception.BotoServerError, e:
-        return 'AssumeRole failed.', 401
     return c.credentials
 
 
@@ -113,7 +111,11 @@ def response_from_groups(session_name, groups, format=format):
     if aws_role is None:
         return 'Could not find an AWS role for group memberships', 400
 
-    creds =  get_credentials_for(session_name, aws_role)
+    try:
+        creds = get_credentials_for(session_name, aws_role)
+    except boto.exception.BotoServerError, e:
+        return 'AssumeRole failed.', 401
+
     context = {
             'expiration': creds.expiration,
             'aws_access_key_id': creds.access_key,
