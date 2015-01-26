@@ -44,10 +44,9 @@ def get_credentials_for(session_name, role_arn):
         aws_secret_access_key = CONFIG.get('aws_secret_access_key'))
     if conn is None:
         return 'Could not get connection', 500
-    try:
-        c = conn.assume_role(
-          role_arn = role_arn,
-          role_session_name = session_name)
+    c = conn.assume_role(
+        role_arn = role_arn,
+        role_session_name = session_name)
     return c.credentials
 
 
