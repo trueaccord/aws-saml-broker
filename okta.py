@@ -9,12 +9,7 @@ class OktaException(Exception):
 def validate_user(okta_config, username, password):
     r = requests.post('https://%s/api/v1/authn' % okta_config['domain'], data=json.dumps({
         'username': username,
-        'password': password,
-        'relayState': 'gogo',
-        'context': {
-            'userAgent': 'aws-saml-broker/0.1',
-        }
-        }),headers={
+        'password': password}),headers={
         'Content-Type': 'application/json',
         'Authorization': 'SSWS %s' % okta_config['api_token']
         })
