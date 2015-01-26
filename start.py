@@ -84,7 +84,7 @@ def index():
     except KeyError:
         return 'Group attribute was not found in SAML.', 400
 
-    return response_from_groups(session=user, groups=groups, format='awscli')
+    return response_from_groups(session_name=user, groups=groups, format='awscli')
 
 
 @app.route("/login/okta", methods=['POST'])
