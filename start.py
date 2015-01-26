@@ -74,6 +74,7 @@ def index():
         return 'User attribute could not be found in SAML.', 400
     if len(user) != 1:
         return 'User attribute contained more than one value.', 400
+    user = user[0]
 
     group_attribute = CONFIG['group_attribute']
     try:
@@ -113,10 +114,11 @@ def response_from_groups(session_name, groups, format=format):
     try:
         creds = get_credentials_for(session_name, aws_role)
     except boto.exception.BotoServerError, e:
-        return 'AssumeRole failed.', 401
+        return 'AssumeRole failed for role "%s"' % aws_role, 401
 
     context = {
             'expiration': creds.expiration,
+            'aws_role': aws_role,
             'aws_access_key_id': creds.access_key,
             'aws_secret_access_key': creds.secret_key,
             'aws_session_token': creds.session_token
