@@ -102,7 +102,7 @@ def login_okta():
         email, user_id = okta.validate_user(okta_config, username, password)
         groups = okta.get_groups(okta_config, user_id)
     except okta.OktaException, e:
-        return str(e)
+        return str(e), 401
     return response_from_groups(session_name=email, groups=groups, format=format)
 
 
