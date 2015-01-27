@@ -55,6 +55,7 @@ FORMATS = {
 # Will expire on %(expiration)s
 aws_access_key_id = %(aws_access_key_id)s
 aws_secret_access_key = %(aws_secret_access_key)s
+aws_security_token = %(aws_session_token)s
 aws_session_token = %(aws_session_token)s""" % c),
         'json': ('application/json', lambda c: json.dumps(c, indent=4))
         }
