@@ -12,7 +12,7 @@ to install locally by inspecting the Dockerfile.
 
 To pull a prebuilt image:
 
-   $ docker pull thesamet/aws-saml-broker
+   $ docker pull trueaccord/aws-saml-broker
 
 To build the image from scratch:
 
